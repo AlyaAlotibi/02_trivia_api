@@ -11,10 +11,10 @@ def paginate_question(request, selection):
   page = request.args.get('page', 1, type=int)
   start =  (page - 1) * QUESTIONS_PER_PAGE
   end = start + QUESTIONS_PER_PAGE
-  question = [book.format() for book in selection]
-  current_books = question[start:end]
+  question = [question.format() for question in selection]
+  current_questions = question[start:end]
 
-  return current_books
+  return current_questions
 def create_app(test_config=None):
   # create and configure the app
   app = Flask(__name__)
@@ -152,7 +152,26 @@ def create_app(test_config=None):
   only question that include that string within their question. 
   Try using the word "title" to start. 
   '''
+  @app.route('/questions/search', methods=['POST'])
+  def get_questions():
+    body = request.get_json()
+    search = body.get('search', None)
+    try:
+      question=Question.query.filter(Question.question.ilike('%{}%'.format(search))).all()
 
+      categories = Category.query.order_by(Category.id).all()
+      for s in question:
+         for c in categories:
+          if int(s.category)==c.id:
+             category1=c.type
+      return jsonify({
+      'success': True,
+      'questions': [q.format() for q in question],
+      'totalQuestions': len(Question.query.all())
+      ,'currentCategory':category1
+      })
+    except:
+      abort(404)
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
@@ -194,6 +213,13 @@ def create_app(test_config=None):
       "error": 422,
       "message": "unprocessable"
       }), 422
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      "success": False, 
+      "error": 400,
+      "message": "bad request"
+      }), 400
   return app
 
     
