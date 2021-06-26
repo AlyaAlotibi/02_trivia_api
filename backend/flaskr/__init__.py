@@ -14,12 +14,12 @@ def create_app(test_config=None):
   setup_db(app)
   
   '''
-  @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+  @TO1: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
   CORS(app)
 
   '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
+  @TO1: Use the after_request decorator to set Access-Control-Allow
   '''
   @app.after_request
   def after_request(response):
@@ -28,11 +28,21 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
     return response
   '''
-  @TODO: 
+  @TO1: 
   Create an endpoint to handle GET requests 
   for all available categories.
   '''
+  @app.route('/categories')
+  def available_categories():
+    categories = Category.query.order_by(Category.id).all()
 
+    if len(Category.query.all()) == 0:
+      abort(404)
+
+    return jsonify({
+      'success': True,
+      'categories':  {category.id: category.type for category in categories}
+    })
 
   '''
   @TODO: 
