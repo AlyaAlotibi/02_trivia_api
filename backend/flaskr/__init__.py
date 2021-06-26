@@ -64,7 +64,7 @@ def create_app(test_config=None):
   Clicking on the page numbers should update the questions. 
   '''
   @app.route('/questions')
-  def retrieve_books():
+  def retrieve_questions():
     selection = Question.query.order_by(Question.id).all()
     current_question = paginate_question(request, selection)
     categories = Category.query.order_by(Category.id).all()
@@ -94,23 +94,48 @@ def create_app(test_config=None):
     deletedQ=Question.query.filter(Question.id==question_id).one_or_none()
     if deletedQ is None:
       abort(404)
-    deletedQ.delete()
-    selection = Question.query.order_by(Question.id).all()
-    current_question = paginate_question(request, selection)
-    return jsonify({
+    try:
+      deletedQ.delete()
+      selection = Question.query.order_by(Question.id).all()
+      current_question = paginate_question(request, selection)
+      return jsonify({
         'success': True,
         'deleted': question_id,
         'questions':current_question,
         'totalQuestions': len(selection)
       })
+    except:
+      abort(422)
 
     
   '''
-  @TODO: 
+  @TO1: 
   Create an endpoint to POST a new question, 
   which will require the question and answer text, 
   category, and difficulty score.
+  '''
+  @app.route('/questions', methods=['POST'])
+  def post_question():
+    body=request.get_json()
+    new_question =body.get('question',None)
+    new_answer = body.get('answer',None)
+    new_category = body.get('category',None)
+    new_difficulty = body.get('difficulty',None)
+    try:
+      question=Question(question=new_question,answer=new_answer,category=new_category,difficulty=new_difficulty)
+      question.insert()
+      selection = Question.query.order_by(Question.id).all()
+      current_question = paginate_question(request, selection)
+      return jsonify({
+        'success': True,
+        'created': question.id,
+        'questions':current_question,
+        'totalQuestions': len(selection)
+       })
+    except:
+      abort(422)
 
+  '''
   TEST: When you submit a question on the "Add" tab, 
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
