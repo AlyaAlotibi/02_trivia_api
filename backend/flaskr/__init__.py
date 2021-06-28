@@ -183,13 +183,18 @@ def create_app(test_config=None):
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def retrieve_by_category(category_id):
     try:
+      categories = Category.query.filter(Category.id==category_id).all()
       questions=Question.query.filter(Question.category==str(category_id)).all()
+      for s in questions:
+         for c in categories:
+          if int(s.category)==c.id:
+             category1=c.type
       
       return jsonify({
         'success': True,
-     'questions': [question.format() for question in questions],
+        'question':[question.format() for question in questions],
          'totalQuestions': len(questions),
-         'currentCategory':category_id
+         'currentCategory':category1
          })
     except:
       abort(404)
