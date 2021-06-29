@@ -14,7 +14,7 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia_test"
+        self.database_name = "trivia"
         self.database_path = "postgresql://{}:{}@{}/{}".format('postgres', '123','localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
         self.new_question={
@@ -94,7 +94,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['answer'])
         self.assertTrue(data['category'])
         self.assertTrue(data['difficulty'])
-    
+    def test_405_if_question_creation_not_allowed(self):
+        res = self.client().post('/questions/45', json=self.new_book)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
