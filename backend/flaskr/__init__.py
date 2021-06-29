@@ -94,7 +94,7 @@ def create_app(test_config=None):
   def delete_question(question_id):
     deletedQ=Question.query.filter(Question.id==question_id).one_or_none()
     if deletedQ is None:
-      abort(404)
+      abort(422)
     try:
       deletedQ.delete()
       selection = Question.query.order_by(Question.id).all()

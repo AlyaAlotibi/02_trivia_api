@@ -76,13 +76,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['totalQuestions'])
         self.assertTrue(data['questions'])
         self.assertEqual(question, None)
-    def test_404_if_question_does_not_exist(self):
+    def test_422_if_question_does_not_exist(self):
         res = self.client().delete('/questions/1000')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 404)
+        self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'resource not found')
+        self.assertEqual(data['message'], 'unprocessable')
     def test_create_new_question(self):
         res = self.client().post('/questions', json=self.new_question)
         data = json.loads(res.data)
