@@ -14,7 +14,7 @@ class TriviaTestCase(unittest.TestCase):
         """Define test variables and initialize app."""
         self.app = create_app()
         self.client = self.app.test_client
-        self.database_name = "trivia"
+        self.database_name = "trivia_test"
         self.database_path = "postgresql://{}:{}@{}/{}".format('postgres', '123','localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
         self.new_question={
@@ -76,13 +76,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['totalQuestions'])
         self.assertTrue(data['questions'])
         self.assertEqual(question, None)
-    def test_422_if_question_does_not_exist(self):
+    def test_404_if_question_does_not_exist(self):
         res = self.client().delete('/questions/1000')
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 422)
+        self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'unprocessable')
+        self.assertEqual(data['message'], 'resource not found')
     def test_create_new_question(self):
         res = self.client().post('/questions', json=self.new_question)
         data = json.loads(res.data)
@@ -95,7 +95,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['category'])
         self.assertTrue(data['difficulty'])
     def test_405_if_question_creation_not_allowed(self):
-        res = self.client().post('/questions/45', json=self.new_book)
+        res = self.client().post('/questions/45', json=self.new_question)
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 405)
