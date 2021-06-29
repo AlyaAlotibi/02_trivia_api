@@ -126,6 +126,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(data['question'])
         self.assertTrue(data['totalQuestions'])
         self.assertTrue(data['currentCategory'])
+    def test_405_quizzes_without_parameters_not_allowed(self):
+        res = self.client().get('/quizzes')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 405)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'method not allowed')
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
