@@ -133,6 +133,13 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 405)
         self.assertEqual(data['success'], False)
         self.assertEqual(data['message'], 'method not allowed')
+    def test_400_for_failed_quizzes(self):
+        res = self.client().post('/quizzes',json={'quiz_category': '2'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'], 'bad request')
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
